@@ -64,8 +64,11 @@ Logger.log(typeof allDateIndices[0]);
 
 
 
-function highlightCurrentDayRow(allDateIndices) {  
+function highlightCurrentDayRow(...allDateIndices) {  
   var row_backgrounds = fullRange.getBackgrounds();
+  Logger.log("howdy");
+  Logger.log(allDateIndices);
+  Logger.log("whatever");
 
   for (row of allDateIndices) {
     // row_backgrounds[row][1] = 'lightblue';
@@ -85,64 +88,42 @@ function highlightCurrentDayRow(allDateIndices) {
   fullRange.setBackgrounds(row_backgrounds);
 }
 
-highlightCurrentDayRow(allDateIndices)
+highlightCurrentDayRow(...allDateIndices);
 
 var firstAnimalColumn = 1; // Replace 1 with the column number where your dates are located
 var numAnimals = 3;
 
-// function highlightWeightLoss(allDateIndices) {  
-//   var values = fullRange.getValues();
-//   var backgrounds = fullRange.getBackgrounds();
-
-//   for (row of allDateIndices) {
-//     Logger.log("index is: "+typeof row);
-//     for (col = firstAnimalColumn; column < firstAnimalColumn + numAnimals; column++) {
-//       Logger.log(col)
-
-//       if (row < todaysIndex) {
-//         backgrounds[row].fill(ColorNames.LIGHT_BLUE); // Set background color to yellow for the current day
-//       }
-//       else if (row == todaysIndex) {
-//         backgrounds[row].fill(ColorNames.YELLOW); // Set background color to yellow for the current day
-//       }
-//       else if (row > todaysIndex) {
-//         backgrounds[row].fill(''); // Set background color to yellow for the current day
-//       }
-//     }
-//   }
-  
-//   fullRange.setBackgrounds(backgrounds);
-// }
-
-// highlightWeightLoss(allDateIndices)
-
 
 function highlightWeightLoss(allDateIndices, todaysIndex) {
-  var first_date = Math.min(...allDateIndices) + 1;
-  var current_date = Math.max(...todaysIndex) + 1;
+  Logger.log("hi"+allDateIndices);
+  var first_date = 3//Math.min(...allDateIndices) + 1;
+  var current_date = 17//Math.max(...todaysIndex) + 1;
   var num_rows = current_date + 1 - first_date;
 
 
-  var animalRange = sheet.getRange(first_date, firstAnimalColumn, num_rows, numAnimals); 
+  var animalRange = sheet.getRange(first_date, firstAnimalColumn + 1, num_rows, numAnimals + 1); 
   var values = animalRange.getValues();
-  Logger.log(values)
+
   var backgrounds = animalRange.getBackgrounds();
 
-  // for (column = firstAnimalColumn; column < firstAnimalColumn + numAnimals; column++) {
-  //   for (var i = 1; i < values.length; i++) {
-  //     var currentValue = values[i][column];
-  //     var previousValue = values[i - 1][column];
-  //     if (!Number.isInteger(currentValue)) {
-  //       backgrounds[i][column] = ColorNames.BLACK; // Set background color to light red
-  //     }
-  //     else if (currentValue < previousValue*.9) {
-  //       Logger.log(Number.isInteger(currentValue));
-  //       backgrounds[i][column] = ColorNames.RED; // Set background color to light red
-  //     }
-  //   }
-  // }
+  for (var col = 0; col < numAnimals; col++) {
+    previousValue = previous2Value = 0;
+    for (var row = 0; row < num_rows-1; row++) {
+      currentValue = values[row][col];
 
+      if (!Number.isInteger(currentValue)) {
+        backgrounds[row][col] = 'blue';
+      }
+      else if (currentValue < previousValue*.9){
+        backgrounds[row][col] = 'red';
+      }
+      else if ((currentValue < previousValue*0.99) && (previousValue < previous2Value*0.99)){
+        backgrounds[row][col] = 'orange';
+      }
+      previous2Value = previousValue;
+      previousValue = currentValue;
+    }
+  }
   animalRange.setBackgrounds(backgrounds);
-
 }
-highlightWeightLoss(allDateIndices, todaysIndex)
+highlightWeightLoss(allDateIndices, todaysIndex);
