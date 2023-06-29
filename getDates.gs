@@ -22,86 +22,63 @@ function findValidDateRows() {
   var date_range = sheet.getRange(1, dateColumn, sheet.getLastRow(), 1);
   var all_dates = date_range.getValues();
 
-  var pastIndex = [];
-  var todaysIndex = [];
-  var futureIndex = [];
-
   var today = new Date();
   today.setHours(0, 0, 0, 0); // Set time to midnight
 
+  var firstDate = -1;
   for (var i = 0; i < all_dates.length; i++) {
     var timestamp = all_dates[i][dateColumn - 1];
     if (timestamp instanceof Date && !isNaN(timestamp.getTime())) {
       timestamp.setHours(0, 0, 0, 0);
 
-      if (timestamp < today) {
-        pastIndex.push(i)
+      if (firstDate == -1){
+        firstDate = i;
       }
-      else if (timestamp.getTime() === today.getTime()) {
-        todaysIndex.push(i)
+      if (timestamp.getTime() === today.getTime()) {
+        todaysDate = i;
       }
-      else if (today < timestamp) {
-        futureIndex.push(i)
-      }
+      var lastDate = i;
     }
   }
-  return [pastIndex, todaysIndex, futureIndex]
+  return [firstDate, todaysDate, lastDate];
 }
 
 
-var dateIndices = findValidDateRows();
-var pastIndex = dateIndices[0];
-var todaysIndex = dateIndices[1];
-var futureIndex = dateIndices[2];
-Logger.log(typeof pastIndex[0]);
-Logger.log("new valid_index: "+typeof todaysIndex[0]);
-Logger.log(typeof futureIndex[0]);
-var allDateIndices = [].concat(...dateIndices);
-// var allDateIndices = Number(allDateIndices)
-Logger.log(typeof allDateIndices[0]);
+num: dateIndices = findValidDateRows();
+num: firstDate = dateIndices[0];
+num: todaysDate = dateIndices[1];
+var lastDate = dateIndices[2];
 
 
-
-
-
-function highlightCurrentDayRow(...allDateIndices) {  
+function highlightCurrentDayRow(firstDate, todaysDate, lastDate) {  
   var row_backgrounds = fullRange.getBackgrounds();
-  Logger.log("howdy");
-  Logger.log(allDateIndices);
-  Logger.log("whatever");
 
-  for (row of allDateIndices) {
-    // row_backgrounds[row][1] = 'lightblue';
+  for (row=firstDate; row<lastDate; row++) {
 
-    if (row < todaysIndex) {
+    if (row < todaysDate) {
       row_backgrounds[row].fill(ColorNames.LIGHT_BLUE); // Set background color to yellow for the current day
     }
-    else if (row == todaysIndex) {
+    else if (row == todaysDate) {
       row_backgrounds[row].fill(ColorNames.YELLOW); // Set background color to yellow for the current day
     }
-    else if (row > todaysIndex) {
+    else if (row > todaysDate) {
       row_backgrounds[row].fill(''); // Set background color to yellow for the current day
     }
 
   }
-  
   fullRange.setBackgrounds(row_backgrounds);
 }
 
-highlightCurrentDayRow(...allDateIndices);
+highlightCurrentDayRow(firstDate, todaysDate, lastDate);
 
 var firstAnimalColumn = 1; // Replace 1 with the column number where your dates are located
 var numAnimals = 3;
 
 
-function highlightWeightLoss(allDateIndices, todaysIndex) {
-  Logger.log("hi"+allDateIndices);
-  var first_date = 3//Math.min(...allDateIndices) + 1;
-  var current_date = 17//Math.max(...todaysIndex) + 1;
-  var num_rows = current_date + 1 - first_date;
+function highlightWeightLoss(firstDate, todaysDate) {
+  var num_rows = todaysDate + 1 - firstDate;
 
-
-  var animalRange = sheet.getRange(first_date, firstAnimalColumn + 1, num_rows, numAnimals + 1); 
+  var animalRange = sheet.getRange(firstDate + 1, firstAnimalColumn + 1, num_rows, numAnimals + 1); 
   var values = animalRange.getValues();
 
   var backgrounds = animalRange.getBackgrounds();
@@ -126,4 +103,4 @@ function highlightWeightLoss(allDateIndices, todaysIndex) {
   }
   animalRange.setBackgrounds(backgrounds);
 }
-highlightWeightLoss(allDateIndices, todaysIndex);
+highlightWeightLoss(firstDate, todaysDate);
