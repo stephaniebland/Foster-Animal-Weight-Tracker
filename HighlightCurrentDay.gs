@@ -49,6 +49,5 @@ function highlightCurrentDayRow() {
     }
   }
   
-  date_range.setBackgrounds(backgrounds);
   fullRange.setBackgrounds(row_backgrounds);
 }
