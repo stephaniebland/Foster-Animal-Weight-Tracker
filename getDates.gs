@@ -77,22 +77,16 @@ var numAnimals = 3;
 
 function highlightWeightLoss(firstDate, todaysDate) {
   var numRows = todaysDate + 1 - firstDate;
-  Logger.log("("+(firstDate + 1)+","+(firstAnimalColumn + 1)+","+(numRows)+","+(numAnimals)+")");
-  var animalRange = sheet.getRange(3, 2, 20, 3);
 
   var animalRange = sheet.getRange(firstDate + 1, firstAnimalColumn + 1, numRows, numAnimals);
   var values = animalRange.getValues();
-  Logger.log(values);
-
   var backgrounds = animalRange.getBackgrounds();
 
   for (var col = 0; col < numAnimals; col++) {
     previousValue = previous2Value = 0;
     for (var row = 0; row < numRows; row++) {
-      Logger.log("("+row+","+col+")");
       empty = risky = urgent = false;
       currentValue = values[row][col];
-      Logger.log("("+row+","+col+") = "+values[row][col]);
 
       if (!Number.isInteger(currentValue)) {
         empty = true;
@@ -103,8 +97,8 @@ function highlightWeightLoss(firstDate, todaysDate) {
       else if ((currentValue < previousValue*0.99) && (previousValue < previous2Value*0.99)){
         risky = true;
       }
+
       if (row==numRows-1){
-        Logger.log("last row ("+row+","+col+") = "+values[row][col]);
         if (urgent) {
           backgrounds[row][col] = 'red';
         } else if (risky){
