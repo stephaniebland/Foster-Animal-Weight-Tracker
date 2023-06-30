@@ -44,10 +44,10 @@ function findValidDateRows() {
 }
 
 
-var dateIndices = findValidDateRows();
-var firstDate = dateIndices[0];
-var todaysDate = dateIndices[1];
-var lastDate = dateIndices[2];
+// var dateIndices = findValidDateRows();
+// var firstDate = dateIndices[0];
+// var todaysDate = dateIndices[1];
+// var lastDate = dateIndices[2];
 
 
 function highlightCurrentDayRow(firstDate, todaysDate, lastDate) {  
@@ -69,7 +69,7 @@ function highlightCurrentDayRow(firstDate, todaysDate, lastDate) {
   fullRange.setBackgrounds(row_backgrounds);
 }
 
-highlightCurrentDayRow(firstDate, todaysDate, lastDate);
+// highlightCurrentDayRow(firstDate, todaysDate, lastDate);
 
 var firstAnimalColumn = 1; // Replace 1 with the column number where your dates are located
 var numAnimals = 3;
@@ -77,13 +77,10 @@ var numAnimals = 3;
 
 function highlightWeightLoss(firstDate, todaysDate) {
   var numRows = todaysDate + 1 - firstDate;
-  // Logger.log(firstDate + 1);
-  // Logger.log(firstAnimalColumn + 1);
-  // Logger.log(numRows);
-  // Logger.log(numAnimals);
-  var animalRange = sheet.getRange(3, 2, 19, 3);
+  Logger.log("("+(firstDate + 1)+","+(firstAnimalColumn + 1)+","+(numRows)+","+(numAnimals)+")");
+  var animalRange = sheet.getRange(3, 2, 20, 3);
 
-  // var animalRange = sheet.getRange(firstDate + 1, firstAnimalColumn + 1, numRows, numAnimals);
+  var animalRange = sheet.getRange(firstDate + 1, firstAnimalColumn + 1, numRows, numAnimals);
   var values = animalRange.getValues();
   Logger.log(values);
 
@@ -92,10 +89,10 @@ function highlightWeightLoss(firstDate, todaysDate) {
   for (var col = 0; col < numAnimals; col++) {
     previousValue = previous2Value = 0;
     for (var row = 0; row < numRows; row++) {
-
+      Logger.log("("+row+","+col+")");
       empty = risky = urgent = false;
       currentValue = values[row][col];
-      Logger.log("("+row+","+col+") = "+currentValue);
+      Logger.log("("+row+","+col+") = "+values[row][col]);
 
       if (!Number.isInteger(currentValue)) {
         empty = true;
@@ -106,8 +103,8 @@ function highlightWeightLoss(firstDate, todaysDate) {
       else if ((currentValue < previousValue*0.99) && (previousValue < previous2Value*0.99)){
         risky = true;
       }
-      if (row == numRows-1){
-        Logger.log("special row: ("+row+","+col+") = "+currentValue);
+      if (row==numRows-1){
+        Logger.log("last row ("+row+","+col+") = "+values[row][col]);
         if (urgent) {
           backgrounds[row][col] = 'red';
         } else if (risky){
@@ -131,4 +128,21 @@ function highlightWeightLoss(firstDate, todaysDate) {
   animalRange.setBackgrounds(backgrounds);
 }
 
-highlightWeightLoss(firstDate, todaysDate);
+// highlightWeightLoss(firstDate, todaysDate);
+
+
+/**
+ * The event handler triggered when editing the spreadsheet.
+ * @param {Event} e The onEdit event.
+ * @see https://developers.google.com/apps-script/guides/triggers#onedite
+ */
+function onEdit(e) {
+  var dateIndices = findValidDateRows();
+  var firstDate = dateIndices[0];
+  var todaysDate = dateIndices[1];
+  var lastDate = dateIndices[2];
+  highlightCurrentDayRow(firstDate, todaysDate, lastDate);
+  highlightWeightLoss(firstDate, todaysDate);
+
+
+}
