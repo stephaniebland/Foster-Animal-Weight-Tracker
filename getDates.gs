@@ -44,9 +44,9 @@ function findValidDateRows() {
 }
 
 
-num: dateIndices = findValidDateRows();
-num: firstDate = dateIndices[0];
-num: todaysDate = dateIndices[1];
+var dateIndices = findValidDateRows();
+var firstDate = dateIndices[0];
+var todaysDate = dateIndices[1];
 var lastDate = dateIndices[2];
 
 
@@ -76,26 +76,53 @@ var numAnimals = 3;
 
 
 function highlightWeightLoss(firstDate, todaysDate) {
-  var num_rows = todaysDate + 1 - firstDate;
+  var numRows = todaysDate + 1 - firstDate;
+  // Logger.log(firstDate + 1);
+  // Logger.log(firstAnimalColumn + 1);
+  // Logger.log(numRows);
+  // Logger.log(numAnimals);
+  var animalRange = sheet.getRange(3, 2, 19, 3);
 
-  var animalRange = sheet.getRange(firstDate + 1, firstAnimalColumn + 1, num_rows, numAnimals + 1); 
+  // var animalRange = sheet.getRange(firstDate + 1, firstAnimalColumn + 1, numRows, numAnimals);
   var values = animalRange.getValues();
+  Logger.log(values);
 
   var backgrounds = animalRange.getBackgrounds();
 
   for (var col = 0; col < numAnimals; col++) {
     previousValue = previous2Value = 0;
-    for (var row = 0; row < num_rows-1; row++) {
+    for (var row = 0; row < numRows; row++) {
+
+      empty = risky = urgent = false;
       currentValue = values[row][col];
+      Logger.log("("+row+","+col+") = "+currentValue);
 
       if (!Number.isInteger(currentValue)) {
-        backgrounds[row][col] = 'blue';
+        empty = true;
       }
       else if (currentValue < previousValue*.9){
-        backgrounds[row][col] = 'red';
+        urgent = true;
       }
       else if ((currentValue < previousValue*0.99) && (previousValue < previous2Value*0.99)){
-        backgrounds[row][col] = 'orange';
+        risky = true;
+      }
+      if (row == numRows-1){
+        Logger.log("special row: ("+row+","+col+") = "+currentValue);
+        if (urgent) {
+          backgrounds[row][col] = 'red';
+        } else if (risky){
+          backgrounds[row][col] = 'orange';
+        } else if (empty){
+          backgrounds[row][col] = 'yellow';
+        }
+      } else {
+        if (urgent) {
+          backgrounds[row][col] = '#ff9595';
+        } else if (risky){
+          backgrounds[row][col] = '#f7c385';
+        } else if (empty){
+          backgrounds[row][col] = 'blue';
+        }
       }
       previous2Value = previousValue;
       previousValue = currentValue;
@@ -103,4 +130,5 @@ function highlightWeightLoss(firstDate, todaysDate) {
   }
   animalRange.setBackgrounds(backgrounds);
 }
+
 highlightWeightLoss(firstDate, todaysDate);
